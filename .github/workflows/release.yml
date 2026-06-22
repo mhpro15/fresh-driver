@@ -1,0 +1,52 @@
+name: Release
+
+# Build the Windows app + installer and publish a GitHub Release whenever a
+# version tag (e.g. v0.1.0) is pushed. Also runnable manually.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "src-tauri -> target"
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build installer and publish release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Fresh Driver ${{ github.ref_name }}"
+          releaseBody: |
+            ### Fresh Driver — Windows installer
+
+            Download **`Fresh Driver_*_x64-setup.exe`** below, double-click, and install (no admin needed).
+
+            Requires Windows 10 (version 1803+) or Windows 11. The build is unsigned, so
+            SmartScreen may show "unknown publisher" — click *More info → Run anyway*.
+          releaseDraft: true
+          prerelease: false
