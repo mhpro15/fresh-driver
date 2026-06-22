@@ -86,12 +86,24 @@ npm run tauri build    # produce an NSIS installer (per-user, no admin to instal
 
 ## Notes & limitations
 
-- **Windows Update** often lags behind GPU vendors — that's why the vendor check
-  exists. The NVIDIA *latest-version* auto-lookup is intentionally **not**
-  automated: NVIDIA's lookup endpoints are undocumented and their ToS prohibits
-  automated access, so the app detects your current version and links you to the
-  official download instead.
-- Vendor coverage currently = NVIDIA detection. OEM tools (Dell `dcu-cli`,
-  Lenovo Thin Installer, HP HPIA) are the natural next integrations.
+- **Windows-only** (uses Windows driver APIs, WMI, the Windows Update Agent, and `pnputil`).
+- The build is **unsigned**, so Windows SmartScreen shows an "unknown publisher" prompt
+  until a code-signing certificate is added.
+- **NVIDIA** latest-version lookup uses NVIDIA's public (undocumented) endpoint — it shows
+  the version and links to the official download, and degrades gracefully if unreachable.
+- **OEM** coverage: Lenovo works tool-free (catalog); Dell/HP use their own tools
+  (`dcu-cli` / HP CMSL) when installed, otherwise link to official support.
 - A future optimization is replacing the PowerShell shell-out with direct
   `windows-rs` bindings for speed.
+
+## Disclaimer
+
+Fresh Driver installs and rolls back device drivers, which can affect system stability.
+It always offers a System Restore point before installing and only downloads from
+Microsoft- or vendor-official sources — but it is provided **"as is", without warranty**
+(see [LICENSE](LICENSE)). Use at your own risk.
+
+## License
+
+[MIT](LICENSE) © 2026 mhpro15. Bundled third-party data is credited in
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

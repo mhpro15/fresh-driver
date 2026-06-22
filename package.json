@@ -1,7 +1,9 @@
 {
-  "name": "tauri-app",
+  "name": "fresh-driver",
   "private": true,
   "version": "0.1.0",
+  "description": "A Windows driver manager — scan, find updates, install with rollback.",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
